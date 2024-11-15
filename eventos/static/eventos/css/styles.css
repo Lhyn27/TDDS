@@ -1,0 +1,97 @@
+/* Reseteo de márgenes y padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Estilos del navbar */
+header {
+    background-color: #5f66c7;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #7c89c5;
+}
+
+.navbar-brand a, .navbar-link, .nav-link {
+    color: #ffffff !important;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.navbar-menu {
+    list-style-type: none;
+    display: flex;
+}
+
+.navbar-menu li {
+    margin-left: 20px;
+}
+
+.navbar-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.navbar-menu a:hover {
+    color: #dddddd;
+}
+
+
+.header-section {
+    background-color: #1c1c1c;
+    color: #ffffff;
+    text-align: center;
+    padding: 50px 0;
+}
+
+.featured-events {
+    background-color: #f2f2f2;
+    padding: 40px 0;
+}
+
+.event-card {
+    border-radius: 8px;
+    background-color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
+.btn-primary {
+    background-color: #000000;
+    border-color: #000000;
+}
+
+
+.body {
+    display: grid;
+    grid-template-rows: auto 1fr auto; /* Navbar en la parte superior, contenido en el medio y footer en la parte inferior */
+    min-height: 100vh; /* Asegura que ocupe todo el alto de la pantalla */
+}
+
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+
+.content {
+    padding: 20px;
+}

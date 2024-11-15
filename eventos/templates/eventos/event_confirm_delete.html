@@ -1,0 +1,26 @@
+{% extends "eventos/base.html" %}
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center align-items-center">
+    <div class="card text-center bg-dark border-light shadow-lg" style="max-width: 500px;">
+        <div class="card-body">
+            <h2 class="card-title text-warning mb-4">
+                <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Eliminación
+            </h2>
+            <p class="card-text text-light">
+                ¿Estás seguro de que quieres eliminar el libro "<b>{{ event.name }}</b>"?
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" class="btn btn-danger btn-lg me-2">
+                        <i class="bi bi-trash-fill"></i> Confirmar
+                    </button>
+                    <a href="{% url 'eventHome' %}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-circle-fill"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
