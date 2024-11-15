@@ -1,5 +1,61 @@
 {% extends "eventos/base.html" %}
 
 {% block content %}
+<<<<<<< HEAD
+<div class="container mt-4">
+    <div class="row">
+        <!-- Barra lateral de búsqueda -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Filtrar Eventos</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="">
+                        <div class="mb-3">
+                            <label for="search" class="form-label">Buscar por nombre:</label>
+                            <input type="text" name="search" id="search" class="form-control" placeholder="Buscar eventos...">
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit">Buscar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
+        <!-- Lista de eventos -->
+        <div class="col-md-9">
+            <div class="row">
+                {% for event in events %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.name }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Placeholder">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ event.name }}</h5>
+                            <p class="card-text">
+                                <strong>Precio:</strong> ${{ event.price }}<br>
+                                <strong>Fecha:</strong> {{ event.date }}<br>
+                                <strong>Hora:</strong> {{ event.time }}<br>
+                                <strong>Lugar:</strong> {{ event.location }}<br>
+                                <strong>Entradas disponibles:</strong> {{ event.available_tickets }}
+                            </p>
+                            <a href="#" class="btn btn-primary">Comprar entrada</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p>No hay eventos disponibles en este momento.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+=======
+
+>>>>>>> 32690f1138692f8d83c7faa2b57cc9ebb9e19fa1
 {% endblock content %}

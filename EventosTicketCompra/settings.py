@@ -28,8 +28,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+<<<<<<< HEAD
+LOGIN_REDIRECT_URL = 'eventHome'
+LOGOUT_REDIRECT_URL = 'eventHome'
+=======
 LOGIN_REDIRECT_URL = ''
 LOGOUT_REDIRECT_URL = ''
+>>>>>>> 32690f1138692f8d83c7faa2b57cc9ebb9e19fa1
 
 # Application definition
 

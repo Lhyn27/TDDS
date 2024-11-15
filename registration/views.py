@@ -2,6 +2,10 @@ from django import forms
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
+<<<<<<< HEAD
+
+=======
+>>>>>>> 32690f1138692f8d83c7faa2b57cc9ebb9e19fa1
 # Create your views here.
 
 class SignUpView(CreateView):
