@@ -1,0 +1,23 @@
+{% extends "juegos/base.html" %}
+{% block content %}
+<h2>Iniciar Sesión</h2>
+<div class='col-md-6 mx-auto'>
+    <form method='post'>
+        {% csrf_token %}
+        <p>
+            <label>Username</label>
+            <input type="text" name="username" class="form-control" required>
+        </p>
+        <p>
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required>
+        </p>
+        {% if form.non_field_errors %}
+        <p class="text-danger">Usuario y/o contraseña incorrectos, intente nuevamente</p>
+        {% endif %}
+        <p><a style="text-decoration: none" href="{% url 'signup' %}">Cree una cuenta aquí</a></p>
+        <input type="submit" class="btn btn-success" value="Login">
+        <a href="{% url 'gameList' %}" class="btn btn-dark">Volver</a>
+    </form>
+</div>
+{% endblock content %}
