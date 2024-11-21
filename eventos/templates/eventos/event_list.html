@@ -1,6 +1,7 @@
 {% extends "eventos/base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css"> 
 <div class="container mt-4">
     <div class="row">
         <!-- Barra lateral de búsqueda -->
@@ -23,10 +24,10 @@
 
         <!-- Lista de eventos -->
          {% if Events %}
-         <div class="col-md-9">
+         <div class="col-md-9" id='eventList'>
             <div class="row">
                 {% for event in Events %}
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-4 event-card">
                     <div class="card">
                         {% if event.image %}
                             <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.name }}">
@@ -48,7 +49,9 @@
                                 </ul>
                                 <strong>Entradas disponibles:</strong> {{ event.available_tickets }}
                             </p>
+                            {% if request.user.is_authenticated %}
                             <a href="{% url 'buy_ticket' event.id %}" class="btn btn-primary">Comprar entrada</a>
+                            {% endif %}
                             {% if request.user.is_staff %}
                             <a href="{% url "updateEvent" event.id %}" class="btn btn-warning">Editar evento</a>
                             <a href="{% url "deleteEvent" event.id %}" class="btn btn-danger">Eliminar evento</a>
@@ -68,4 +71,16 @@
         {% endif %}
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#search").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#eventList .event-card").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+    });
+</script>
 {% endblock content %}

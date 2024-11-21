@@ -24,26 +24,27 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'eventHome' %}"><i class="bi bi-house-door me-1"></i>Inicio</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'eventList' %}"><i class="bi bi-calendar2-week me-1"></i>Eventos</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-list me-1"></i>Opciones
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
+                            <li><a class="dropdown-item" href="{% url 'eventList' %}"><i class="bi bi-calendar2-week me-1"></i>Eventos</a></li>
+                            {% if request.user.is_staff %}
+                            <li><a class="dropdown-item" href="{% url 'createEvent' %}"><i class="bi bi-calendar-plus me-1"></i>Crear Evento</a></li>
+                            <li><a class="dropdown-item" href="{% url 'createCategory' %}"><i class="bi bi-tags me-1"></i>Crear Categoría</a></li>
+                            {% endif %}
+                        </ul>
                     </li>
-                    {% if request.user.is_staff %}
-
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'createEvent' %}"><i class="bi bi-calendar2-week me-1"></i>Crear Evento</a>
+                        <a class="nav-link" href="{% url 'contacto' %}"><i class="bi bi-envelope me-1"></i>Contáctanos</a>
                     </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'createCategory' %}"><i class="bi bi-calendar2-week me-1"></i>Crear Categoria</a>
-                    </li>
-                    {% endif %}
-
                     {% if request.user.is_authenticated %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle me-1"></i>{{ request.user.username }}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{% url "profile" %}"><i class="bi bi-gear me-2"></i>Mi perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
@@ -71,22 +72,6 @@
         {% block content %}
         {% endblock content %}
     </main>
-    <footer class="bg-primary text-white py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 mb-3 mb-md-0">
-                    <h5 class="fw-bold">Sobre nosotros</h5>
-                    <p>Conoce más sobre nuestra misión de conectar a las personas con los mejores eventos y experiencias en su ciudad.</p>
-                    <a href="#" class="text-white text-decoration-none"><i class="bi bi-info-circle me-1"></i>Más información</a>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p>Si tienes preguntas o necesitas asistencia, no dudes en contactarnos.</p>
-                    <a href="{% url "contacto" %}" class="text-white text-decoration-none"><i class="bi bi-envelope me-1"></i>Contáctanos</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
