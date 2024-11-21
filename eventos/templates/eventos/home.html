@@ -27,7 +27,7 @@
                     <p>Fecha: {{ event.date|date:"d/m/Y" }}</p>
                     <p>Hora: {{ event.time|time:"h:i A" }}</p>
                     <p>Lugar: {{ event.location }}</p>
-                    <a href="#" class="btn btn-primary">Comprar entrada</a>
+                    <a href="{% url 'buy_ticket' event.id %}" class="btn btn-primary">Comprar entrada</a>
                 </div>
             </div>
             {% endfor %}

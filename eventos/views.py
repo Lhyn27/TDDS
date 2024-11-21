@@ -1,10 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
-from .forms import EventForm , CategoryForm
-from .models import Event , Category
+from .forms import EventForm, CategoryForm
+from .models import Event, Category
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
@@ -13,6 +13,7 @@ class EventListView(ListView):
     model = Event
     template_name = 'eventos/event_list.html'
     context_object_name = 'Events'
+
 @method_decorator(login_required, name='dispatch')
 class EventCreateView(CreateView):
     model = Event
@@ -52,3 +53,17 @@ def contacto(request):
         Número: +56 9 8765 4321'''
     }
     return render(request, 'eventos/contacto.html', context)
+
+#función para comprar entradas
+def Comprar_Entradas(request, pk):
+    #Se Busca el evento específico en la base de datos usando el ID (pk) pasado en la URL
+    # Si no se encuentra, devuelve un error 404 (página no encontrada).
+    event = get_object_or_404(Event, pk=pk)
+    # Si las entradas disponibles son mayores que 0 , se hace el descuento
+    if event.available_tickets > 0:
+        # Se reducen la cantidad de entradas
+        event.available_tickets -= 1
+        # se guardan los cambios en la base de datos 
+        event.save()
+    #redireccion a la lista de eventos
+    return redirect('eventList')
