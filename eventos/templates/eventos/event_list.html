@@ -49,10 +49,8 @@
                                 </ul>
                                 <strong>Entradas disponibles:</strong> {{ event.available_tickets }}
                             </p>
-                            {% if request.user.is_authenticated %}
+                            {% if not request.user.is_staff %}
                             <a href="{% url 'buy_ticket' event.id %}" class="btn btn-primary">Comprar entrada</a>
-                            {% endif %}
-                            {% if request.user.is_staff %}
                             <a href="{% url "updateEvent" event.id %}" class="btn btn-warning">Editar evento</a>
                             <a href="{% url "deleteEvent" event.id %}" class="btn btn-danger">Eliminar evento</a>
                             {% endif %}

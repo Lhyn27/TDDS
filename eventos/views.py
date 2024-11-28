@@ -3,10 +3,11 @@ from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
-from .forms import EventForm, CategoryForm
+from .forms import EventForm, CategoryForm, UserUpdateForm
 from .models import Event, Category
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 # Create your views here.
 class EventListView(ListView):
@@ -67,3 +68,30 @@ def Comprar_Entradas(request, pk):
         event.save()
     #redireccion a la lista de eventos
     return redirect('eventList')
+
+@method_decorator(login_required, name='dispatch')
+class Listar_Usuario(ListView):
+    model = User
+    template_name = "eventos/listar_usuario.html"
+    context_object_name= 'User'
+
+@method_decorator(login_required, name='dispatch')
+class Detalle_Usuario(DetailView):
+    model = User
+    template_name = 'eventos/detalle_usuario.html'
+    context_object_name = 'User'
+
+@method_decorator(login_required, name='dispatch')
+class Eliminar_Usuario(DeleteView):
+    model = User
+    template_name = "eventos/eliminar_usuario.html"
+    success_url = reverse_lazy('list_user')
+
+@method_decorator(login_required, name='dispatch')
+class Actualizar_Usuario(UpdateView):
+    model = User
+    template_name = "eventos/actualizar_usuario.html"
+    form_class = UserUpdateForm
+    success_url = reverse_lazy('list_user')
+
+

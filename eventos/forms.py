@@ -1,5 +1,6 @@
 from django import forms
 from .models import Event , Category
+from django.contrib.auth.models import User
 
 class EventForm(forms.ModelForm):
     class Meta:
@@ -35,3 +36,31 @@ class CategoryForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
         }
+
+class UserUpdateForm(forms.ModelForm):
+    password = forms.CharField(
+        label="Nueva contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        required=True,  # Opcional: si no es obligatorio cambiar la contraseña
+    )
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']  # Campos editables
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
+            'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
+        }
+        help_texts = {
+            'username': None,  # Elimina el texto de ayuda
+        }
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get('password')
+        if password:  # Si se proporciona una contraseña, actualízala
+            user.set_password(password)
+        if commit:
+            user.save()
+        return user

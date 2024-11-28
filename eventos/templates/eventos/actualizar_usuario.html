@@ -1,0 +1,51 @@
+{% extends "eventos/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="bg-light p-5 rounded shadow">
+        <h2 class="mb-4 text-center">
+            <i class="bi bi-pencil-square text-warning me-2"></i> 
+            Actualizar Usuario
+        </h2>
+
+        <form id="editar_reserva" method="post" class="needs-validation">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-warning btn-lg">
+                    <i class="bi bi-pencil-square me-1"></i> Actualizar
+                </button>
+                <a href="{% url 'list_user' %}" class="btn btn-dark btn-lg ms-2">
+                    <i class="bi bi-arrow-left-circle me-2"></i> Volver
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<script>
+    document.getElementById("editar_reserva").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        $.ajax({
+            url: "{% url 'actualizar_user' object.id %}",
+            type: "post",
+            data: $(this).serialize(),
+            success: function () {
+                Swal.fire({
+                    icon: "success",
+                    title: "Usuario actualizado exitosamente!",
+                    confirmButtonText: "Aceptar"
+                }).then(function () {
+                    window.location.href = "{% url 'list_user' %}";
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
