@@ -1,6 +1,6 @@
 from django import forms
 from .models import Event , Category
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User , Group
 
 class EventForm(forms.ModelForm):
     class Meta:
@@ -41,26 +41,34 @@ class UserUpdateForm(forms.ModelForm):
     password = forms.CharField(
         label="Nueva contraseña",
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        required=True,  # Opcional: si no es obligatorio cambiar la contraseña
+        required=False,  # La contraseña es opcional al actualizar
+    )
+    group = forms.ModelChoiceField(
+        queryset=Group.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True,  # Opcional: si no es obligatorio asignar un grupo
+        label="Rol",
     )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']  # Campos editables
+        fields = ['username', 'password', 'group']
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
             'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
-        }
-        help_texts = {
-            'username': None,  # Elimina el texto de ayuda
         }
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        
+        # Si la contraseña se ha proporcionado, la actualizamos
         password = self.cleaned_data.get('password')
-        if password:  # Si se proporciona una contraseña, actualízala
-            user.set_password(password)
+        if password:
+            user.set_password(password)  # Asegúrate de encriptar la nueva contraseña
+            
         if commit:
-            user.save()
+            user.save()  # Guardamos los cambios en el usuario (sin la contraseña en texto claro)
+        
+        # Asignar el grupo seleccionado
+        user.groups.set([self.cleaned_data['group']])  # Asignamos un solo grupo al usuario
         return user
