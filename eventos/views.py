@@ -50,8 +50,8 @@ class CategoryCreateView(CreateView):
 
 def contacto(request):
     context = {
-        'mensaje': '''Correo electrónico : contacto@eventosmag.cl
-        Número: +56 9 8765 4321'''
+        'mensaje': 'Correo electrónico : eventos@todoarica.cl' ,
+        'mensaje2': 'Número: +56 9 8765 4321'
     }
     return render(request, 'eventos/contacto.html', context)
 
