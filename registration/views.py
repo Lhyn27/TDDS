@@ -2,8 +2,8 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from django.contrib.auth.models import User
 from .forms import ProfileUpdateForm
+from django.contrib.auth.models import Group
 
 
 class SignUpView(CreateView):
@@ -21,6 +21,19 @@ class SignUpView(CreateView):
         form.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control'})
 
         return form
+
+    def form_valid(self, form):
+        # Llamamos al método de validación original
+        response = super().form_valid(form)
+        
+        # Obtenemos el grupo 'Usuario' y lo asignamos al nuevo usuario
+        group = Group.objects.get(name='Usuario')
+        self.object.groups.add(group)
+        
+        # Guardamos los cambios y devolvemos la respuesta
+        self.object.save()
+
+        return response
 
 class ProfileUpdate(UpdateView):
     form_class = ProfileUpdateForm

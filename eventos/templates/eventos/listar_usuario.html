@@ -23,8 +23,7 @@
                         <tr>
                             <th class="col-1 text-center">ID Usuario</th>
                             <th class="col-2 text-center">Nombre de Usuario</th>
-                            <th class="col-2 text-center">Email</th>
-                            <th class="col-2 text-center">Contraseña</th>
+                            <th class="col-2 text-center">Rol</th>
                             <th class="col-2 text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -33,14 +32,18 @@
                         <tr>
                             <td class="text-center">{{ i.id }}</td>
                             <td class="text-center">{{ i.username }}</td>
+                            </td>
                             <td class="text-center">
-                                {% if i.email %}
-                                    {{ i.email }}
+                                {% if i.groups.all %}
+                                    {% for group in i.groups.all %}
+                                        <span class="badge bg-info">{{ group.name }}</span>
+                                    {% endfor %}
+                                {% elif i.is_superuser %}
+                                    <span class="badge bg-success">Admin</span>
                                 {% else %}
-                                    <span class="text-muted">Gmail no registrado</span>
+                                    <span class="text-muted">No asignado a ningún Rol</span>
                                 {% endif %}
                             </td>
-                            <td class="text-center">********</td>
                             <td class="text-center">
                                 <!-- Botones organizados con iconos -->
                                 <div class="d-flex justify-content-center gap-2">

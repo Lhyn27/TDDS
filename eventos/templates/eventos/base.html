@@ -29,14 +29,21 @@
                             <i class="bi bi-list me-1"></i>Opciones
                         </a>    
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
-                            {% if not request.user.is_staff %}
-                            <li><a class="dropdown-item" href="{% url 'eventList' %}"><i class="bi bi-calendar2-week me-1"></i>Eventos</a></li>
-                            <li><a class="dropdown-item" href="{% url 'createEvent' %}"><i class="bi bi-calendar-plus me-1"></i>Crear Evento</a></li>
-                            <li><a class="dropdown-item" href="{% url 'createCategory' %}"><i class="bi bi-tags me-1"></i>Crear Categoría</a></li>
-                            {% else %}
-                            <li><a class="dropdown-item" href="{% url 'list_user' %}"><i class="bi bi-people me-1"></i>Listar Usuarios</a></li>
+                            {% if request.user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'list_user' %}"><i class="bi bi-people me-1"></i>Listar Usuarios</a></li>
                             {% endif %}
-                        </ul>
+                            
+                            {% for group in request.user.groups.all %}
+                                {% if group.name == "Organizador de Eventos" %}
+                                    <li><a class="dropdown-item" href="{% url 'eventList' %}"><i class="bi bi-calendar2-week me-1"></i>Eventos</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'createEvent' %}"><i class="bi bi-calendar-plus me-1"></i>Crear Evento</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'createCategory' %}"><i class="bi bi-tags me-1"></i>Crear Categoría</a></li>
+                                {% endif %}
+                                {% if group.name == "Usuario" %}
+                                    <li><a class="dropdown-item" href="{% url 'eventList' %}"><i class="bi bi-calendar2-week me-1"></i>Eventos</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>                        
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'contacto' %}"><i class="bi bi-envelope me-1"></i>Contáctanos</a>
@@ -59,13 +66,13 @@
                             </li>
                         </ul>
                     </li>
-                    {% else %}
+                {% else %}
                     <li class="nav-item">
                         <a class="nav-link btn btn-outline-light ms-2" href="{% url 'login' %}">
                             <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
                         </a>
                     </li>
-                    {% endif %}
+                {% endif %}                
                 </ul>
             </div>
         </div>
