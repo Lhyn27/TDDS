@@ -5,6 +5,7 @@
 <!-- Enlace al estilo de DataTables -->
 <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
 
+{% if request.user.is_staff %}
 {% if User %}
 <div class="container mt-5">
     <!-- Tarjeta para envolver el contenido -->
@@ -76,6 +77,14 @@
         <h4>No hay usuarios registrados</h4>
     </div>
 </div>
+{% endif %}
+{% else %}
+<div class="container mt-5">
+    <!-- Mensaje que aparecerá cuando un usuario no autorizado intente acceder a la vista a través de la url-->
+    <div class="alert alert-danger text-center">
+        <h4>Usted no está autorizado para acceder a este sitio</h4>
+    </div>
+<div>
 {% endif %}
 
 <!-- Scripts de DataTables y jQuery -->

@@ -1,10 +1,12 @@
+from django.forms import BaseModelForm
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
-from .forms import EventForm, CategoryForm, UserUpdateForm
-from .models import Event, Category
+from .forms import EventForm, CategoryForm, UpdateUserForm, AddToCartForm
+from .models import Event, Category, Cart, CartItem
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -55,19 +57,65 @@ def contacto(request):
     }
     return render(request, 'eventos/contacto.html', context)
 
-#función para comprar entradas
-def Comprar_Entradas(request, pk):
-    #Se Busca el evento específico en la base de datos usando el ID (pk) pasado en la URL
-    # Si no se encuentra, devuelve un error 404 (página no encontrada).
-    event = get_object_or_404(Event, pk=pk)
-    # Si las entradas disponibles son mayores que 0 , se hace el descuento
-    if event.available_tickets > 0:
-        # Se reducen la cantidad de entradas
-        event.available_tickets -= 1
-        # se guardan los cambios en la base de datos 
-        event.save()
-    #redireccion a la lista de eventos
-    return redirect('eventList')
+@method_decorator(login_required, name='dispatch')
+class Anadir_Entradas_Carrito(CreateView):
+    form_class = AddToCartForm
+    template_name = 'eventos/comprar_entrada.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        event = get_object_or_404(Event, pk=self.kwargs['pk'])
+        kwargs['event'] = event  # Pasar el evento al formulario
+        return kwargs
+
+    def form_valid(self, form):
+        event = get_object_or_404(Event, pk=self.kwargs['pk'])
+        cart, _ = Cart.objects.get_or_create(user=self.request.user)
+
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            event=event,
+            defaults={'quantity': form.cleaned_data['quantity']}
+        )
+
+        # Si el ítem ya existía, actualizamos su cantidad
+        if not created:
+            cart_item.quantity = form.cleaned_data['quantity']
+            cart_item.save()
+
+        # Redireccionamos después de añadir al carrito
+        return redirect('cart_view')
+
+    def form_invalid(self, form):
+        # Si el formulario no es válido, renderiza el template con errores
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['event'] = get_object_or_404(Event, pk=self.kwargs['pk'])
+        return context
+
+class Listar_Carrito(ListView):
+    model = Cart
+    template_name = "eventos/carrito.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Obtener el carrito del usuario autenticado
+        cart = Cart.objects.filter(user=self.request.user).first()
+        if cart:
+            cart_items = CartItem.objects.filter(cart=cart)
+            total_price = sum(item.event.price * item.quantity for item in cart_items)
+        else:
+            cart_items = []
+            total_price = 0
+        
+        # Pasar los datos al contexto
+        context['cart'] = cart
+        context['cart_items'] = cart_items
+        context['total_price'] = total_price
+        return context
+
 
 @method_decorator(login_required, name='dispatch')
 class Listar_Usuario(ListView):
@@ -91,7 +139,5 @@ class Eliminar_Usuario(DeleteView):
 class Actualizar_Usuario(UpdateView):
     model = User
     template_name = "eventos/actualizar_usuario.html"
-    form_class = UserUpdateForm
+    form_class = UpdateUserForm
     success_url = reverse_lazy('list_user')
-
-

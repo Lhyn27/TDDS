@@ -1,0 +1,33 @@
+{% extends 'eventos/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Tu Carrito</h1>
+    <hr>
+    {% if cart_items %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Evento</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.event.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.event.price }}</td>
+                        <td>${{ item.event.price }} * {{ item.quantity }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>Total: ${{ total_price }}</h3>
+    {% else %}
+        <p>Tu carrito está vacío.</p>
+    {% endif %}
+</div>
+{% endblock %}

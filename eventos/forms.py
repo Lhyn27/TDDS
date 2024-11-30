@@ -1,5 +1,5 @@
 from django import forms
-from .models import Event , Category
+from .models import Event , Category, CartItem, Cart
 from django.contrib.auth.models import User , Group
 
 class EventForm(forms.ModelForm):
@@ -37,12 +37,7 @@ class CategoryForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
         }
 
-class UserUpdateForm(forms.ModelForm):
-    password = forms.CharField(
-        label="Nueva contraseña",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        required=False,  # La contraseña es opcional al actualizar
-    )
+class UpdateUserForm(forms.ModelForm):
     group = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),
@@ -52,19 +47,13 @@ class UserUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'group']
+        fields = ['username', 'group']
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'}),
-            'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
         }
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        
-        # Si la contraseña se ha proporcionado, la actualizamos
-        password = self.cleaned_data.get('password')
-        if password:
-            user.set_password(password)  # Asegúrate de encriptar la nueva contraseña
             
         if commit:
             user.save()  # Guardamos los cambios en el usuario (sin la contraseña en texto claro)
@@ -72,3 +61,24 @@ class UserUpdateForm(forms.ModelForm):
         # Asignar el grupo seleccionado
         user.groups.set([self.cleaned_data['group']])  # Asignamos un solo grupo al usuario
         return user
+
+class AddToCartForm(forms.ModelForm):
+    quantity = forms.IntegerField(
+        min_value=1,
+        label="Cantidad",
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder':'Cantidad de Entradas'})
+    )
+
+    class Meta:
+        model = CartItem
+        fields = ['quantity']
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event', None) #Se pasa el evento desde la vista
+        super().__init__(*args, **kwargs)
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity')
+        if self.event and quantity > self.event.available_tickets:
+            raise forms.ValidationError('No  hay tickets suficientes.')
+        return quantity

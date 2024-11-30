@@ -11,7 +11,8 @@ urlpatterns = [
     path('create_category/', views.CategoryCreateView.as_view(), name='createCategory'),
     path('contacto/', views.contacto, name='contacto'),
     #Path de cliente
-    path('evento/comprar_entrada/<int:pk>/', views.Comprar_Entradas, name='buy_ticket'),
+    path('evento/comprar_entrada/<int:pk>/', views.Anadir_Entradas_Carrito.as_view(), name='buy_ticket'),
+    path('eventos/carrito',views.Listar_Carrito.as_view() ,name='cart_view'),
     #Path de User
     path('list_usuario/', views.Listar_Usuario.as_view(), name='list_user'),
     path('detalle_usuario/<int:pk>/', views.Detalle_Usuario.as_view(), name='detalle_user'),
