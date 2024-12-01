@@ -12,7 +12,7 @@
             <hr class="border-light">
             <!-- Mensaje de confirmación -->
             <p class="card-text fs-5">¿Estás seguro de que quieres eliminar el usuario <strong>"{{ object.username }}"</strong>?</p>
-            <form method="post" id="eliminar_reserva">
+            <form method="post" id="eliminar_usuario">
                 {% csrf_token %}
                 <!-- Botones estilizados -->
                 <div class="d-flex justify-content-center">
@@ -33,7 +33,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 <script>
-    document.getElementById("eliminar_reserva").addEventListener("submit", function (event) {
+    document.getElementById("eliminar_usuario").addEventListener("submit", function (event) {
         event.preventDefault();
 
         $.ajax({
@@ -43,8 +43,8 @@
             success: function () {
                 Swal.fire({
                     icon: "success",
-                    title: "Registro eliminado",
-                    text: "El registro se ha eliminado correctamente.",
+                    title: "Usuario eliminado",
+                    text: "El usuario se ha eliminado correctamente.",
                     confirmButtonText: "Aceptar"
                 }).then(function () {
                     window.location.href = "{% url 'list_user' %}";

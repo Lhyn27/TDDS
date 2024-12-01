@@ -49,7 +49,11 @@
                                 </ul>
                                 <strong>Entradas disponibles:</strong> {{ event.available_tickets }}
                             </p>
+                            {% if event.available_tickets %}
                             <a href="{% url 'buy_ticket' event.id %}" class="btn btn-primary">Comprar entrada</a>
+                            {% else %}
+                            <button class="btn btn-secondary" disabled>Entradas Agotadas</button>
+                            {% endif %}
                             {% for group in request.user.groups.all %}
                                 {% if group.name == "Organizador de Eventos" %}
                                     <a href="{% url 'updateEvent' event.id %}" class="btn btn-warning">Editar evento</a>

@@ -30,21 +30,19 @@
                     </tr>
                     <tr>
                         <td class="text-center">
-                            <strong><i class="bi bi-envelope-fill text-warning"></i> Email:</strong>
+                            <strong><i class="bi bi-key-fill text-danger"></i> Rol:</strong>
                         </td>
                         <td class="text-center">
-                            {% if User.email %}
-                                {{ User.email }}
+                            {% if User.groups.all %}
+                                {% for group in User.groups.all %}
+                                    <span class="badge bg-info">{{ group.name }}</span>
+                                {% endfor %}
+                            {% elif User.is_superuser %}
+                                <span class="badge bg-success">Admin</span>
                             {% else %}
-                                <span class="text-muted">Gmail no registrado</span>
+                                <span class="text-muted">No asignado a ningún Rol</span>
                             {% endif %}
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">
-                            <strong><i class="bi bi-key-fill text-danger"></i> Contraseña:</strong>
-                        </td>
-                        <td class="text-center">********</td>
                     </tr>
                 </tbody>
             </table>

@@ -27,8 +27,10 @@
                     <p>Fecha: {{ event.date|date:"d/m/Y" }}</p>
                     <p>Hora: {{ event.time|time:"h:i A" }}</p>
                     <p>Ubicacion: {{ event.address }}</p>
-                    {% if request.user.is_authenticated %}
+                    {% if request.user.is_authenticated and event.available_tickets %}
                     <a href="{% url 'buy_ticket' event.id %}" class="btn btn-primary">Comprar entrada</a>
+                    {% elif not event.available_tickets %}
+                    <button class="btn btn-secondary" disabled>Entradas Agotadas</button>
                     {% endif %}
                 </div>
             </div>

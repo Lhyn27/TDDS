@@ -12,6 +12,9 @@ from .models import Event, Category, Cart, CartItem, Order, OrderItem
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 # Create your views here.
 class EventListView(ListView):
@@ -74,6 +77,7 @@ class Anadir_Entradas_Carrito(CreateView):
         event = get_object_or_404(Event, pk=self.kwargs['pk'])
         cart, _ = Cart.objects.get_or_create(user=self.request.user)
 
+        # Agregar o actualizar el item en el carrito
         cart_item, created = CartItem.objects.get_or_create(
             cart=cart,
             event=event,
@@ -168,10 +172,36 @@ class CheckoutView(View):
 
 @method_decorator(login_required, name='dispatch')
 class OrderSuccessView(View):
-    def get(self, request, order_id):
+    def get(self, request, order_id, *args, **kwargs):
+        # Verificar si se requiere generar un PDF
+        if 'pdf' in request.GET:
+            return self.generar_pdf(order_id)
+        
         order = Order.objects.get(id=order_id, user=request.user)
         orderItem = OrderItem.objects.get(id=order_id)
+        
         return render(request, 'eventos/order_success.html', {'order': order, 'orderItem': orderItem})
+
+    def generar_pdf(self, order_id):
+        # Obtener los datos del modelo
+        order = get_object_or_404(Order, id=order_id)
+        order_item = get_object_or_404(OrderItem, order=order)
+        context = {
+            'order': order,
+            'orderItem': order_item,
+            'pdf': True,  # Indicamos que estamos generando un PDF
+        }
+
+        # Renderizar el HTML con la plantilla para el PDF (usa la plantilla existente)
+        html_string = render_to_string('eventos/order_success.html', context)
+
+        # Crear la respuesta HTTP con tipo de contenido PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="order.pdf"'
+
+        # Convertir el HTML a PDF usando WeasyPrint
+        HTML(string=html_string).write_pdf(response)
+        return response
     
 @method_decorator(login_required, name='dispatch')
 class PurchaseHistoryView(View):
