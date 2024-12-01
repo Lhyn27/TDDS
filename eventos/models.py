@@ -36,3 +36,24 @@ class CartItem(models.Model):
 
     def __str__(self) -> str:
         return f"{self.quantity} x {self.event.name}"
+    
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_completed = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f"Pedido #{self.id} - {self.user.username}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price =  models.DecimalField(max_digits=10, decimal_places=2)
+
+    def get_subtotal(self):
+        return self.quantity * self.price
+    
+    def __str__(self) -> str:
+        return f"{self.quantity} x {self.event.name} - ${self.get_subtotal()}"

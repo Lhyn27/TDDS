@@ -1,12 +1,14 @@
-from django.forms import BaseModelForm
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.views.generic import View
+from django.contrib import messages
+from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
 from .forms import EventForm, CategoryForm, UpdateUserForm, AddToCartForm
-from .models import Event, Category, Cart, CartItem
+from .models import Event, Category, Cart, CartItem, Order, OrderItem
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -95,6 +97,7 @@ class Anadir_Entradas_Carrito(CreateView):
         context['event'] = get_object_or_404(Event, pk=self.kwargs['pk'])
         return context
 
+@method_decorator(login_required, name='dispatch')
 class Listar_Carrito(ListView):
     model = Cart
     template_name = "eventos/carrito.html"
@@ -116,6 +119,69 @@ class Listar_Carrito(ListView):
         context['total_price'] = total_price
         return context
 
+@method_decorator(login_required, name='dispatch')
+class CheckoutView(View):
+    template_name = 'eventos/checkout.html'
+    
+    def get(self, request):
+        cart = Cart.objects.filter(user=request.user).first()
+        if not cart or not cart.items.exists():
+            messages.error(request, "Tu carrito está vacío")
+            return redirect('cart_view')
+        cart_items = cart.items.all()
+        total_price = sum([item.event.price * item.quantity for item in cart_items])
+        
+        return render(request, "eventos/checkout.html", {'cart': cart, 'total_price': total_price})
+    
+    def post(self, request):
+        cart = Cart.objects.filter(user=request.user).first()
+        if not cart or not cart.items.exists():
+            messages.error(request, "Tu carrito está vacío")
+            return redirect('cart_view')
+        
+        with transaction.atomic():
+            order = Order.objects.create(
+                user=request.user,
+                total_price=sum(item.event.price * item.quantity for item in cart.items.all()),
+                is_completed=True 
+            )
+
+            for cart_item in cart.items.all():
+                if cart_item.quantity > cart_item.event.available_tickets:
+                    messages.error(request, f"No hay suficientes entradas disponibles para {cart_item.event.name}")
+                    return redirect('cart_view')
+                
+                OrderItem.objects.create(
+                    order=order,
+                    event=cart_item.event,
+                    quantity=cart_item.quantity,
+                    price=cart_item.event.price
+                )
+
+                cart_item.event.available_tickets -= cart_item.quantity
+                cart_item.event.save()
+            
+            cart.items.all().delete()
+
+        messages.success(request, "Compra realizada con éxito.")
+        return redirect('order_success', order_id=order.id)
+
+@method_decorator(login_required, name='dispatch')
+class OrderSuccessView(View):
+    def get(self, request, order_id):
+        order = Order.objects.get(id=order_id, user=request.user)
+        orderItem = OrderItem.objects.get(id=order_id)
+        return render(request, 'eventos/order_success.html', {'order': order, 'orderItem': orderItem})
+    
+@method_decorator(login_required, name='dispatch')
+class PurchaseHistoryView(View):
+    template_name = 'eventos/historial_compras.html'
+
+    def get(self, request):
+        # Obtener todas las órdenes del usuario logueado
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')  # Ordenado por la fecha de creación
+
+        return render(request, self.template_name, {'orders': orders})
 
 @method_decorator(login_required, name='dispatch')
 class Listar_Usuario(ListView):

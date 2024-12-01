@@ -4,6 +4,7 @@
 <div class="container mt-5">
     <h1>Tu Carrito</h1>
     <hr>
+    {% load custom_filters %}
     {% if cart_items %}
         <table class="table table-striped">
             <thead>
@@ -20,12 +21,13 @@
                         <td>{{ item.event.name }}</td>
                         <td>{{ item.quantity }}</td>
                         <td>${{ item.event.price }}</td>
-                        <td>${{ item.event.price }} * {{ item.quantity }}</td>
+                        <td>${{ item.event.price|multiply:item.quantity }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
         <h3>Total: ${{ total_price }}</h3>
+        <a href="{% url "checkout" %}" class='btn btn-success'>Ir a pagar</a>
     {% else %}
         <p>Tu carrito está vacío.</p>
     {% endif %}

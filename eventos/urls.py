@@ -13,6 +13,9 @@ urlpatterns = [
     #Path de cliente
     path('evento/comprar_entrada/<int:pk>/', views.Anadir_Entradas_Carrito.as_view(), name='buy_ticket'),
     path('eventos/carrito',views.Listar_Carrito.as_view() ,name='cart_view'),
+    path('eventos/checkout', views.CheckoutView.as_view(), name='checkout'),
+    path('order-success/<int:order_id>', views.OrderSuccessView.as_view(), name='order_success'),
+    path('mis-compras/', views.PurchaseHistoryView.as_view(), name='historial_compras'),
     #Path de User
     path('list_usuario/', views.Listar_Usuario.as_view(), name='list_user'),
     path('detalle_usuario/<int:pk>/', views.Detalle_Usuario.as_view(), name='detalle_user'),

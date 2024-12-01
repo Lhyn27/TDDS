@@ -57,7 +57,8 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{% url "profile" %}"><i class="bi bi-gear me-2"></i>Mi perfil</a></li>
-                            <li><a class="dropdown-item" href="{% url "cart_view" %}"><i class="bi bi-cart4"></i> Carrito</a></li>
+                            <li><a class="dropdown-item" href="{% url "cart_view" %}"><i class="bi bi-cart4 me-2"></i>Carrito</a></li>
+                            <li><a class="dropdown-item" href="{% url "historial_compras" %}"><i class="bi bi-receipt me-2"></i>Mis Compras</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{% url 'logout' %}" method="post" class="dropdown-item">
