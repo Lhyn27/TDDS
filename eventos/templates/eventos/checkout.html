@@ -1,0 +1,35 @@
+{% extends 'eventos/base.html' %}
+{% block content %}
+
+{% load custom_filters %}
+<div class="container mt-5">
+    <h2>Resumen de tu compra</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Evento</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart.items.all %}
+            <tr>
+                <td>{{ item.event.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.event.price }}</td>
+                <td>${{ item.event.price|multiply:item.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Total: ${{ total_price }}</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class='btn btn-success'>Confirmar Compra</button>
+    </form>
+</div>
+{% endblock %}

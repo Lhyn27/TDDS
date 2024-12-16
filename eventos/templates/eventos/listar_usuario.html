@@ -1,0 +1,100 @@
+{% extends "eventos/base.html" %}
+
+{% block content %}
+
+<!-- Enlace al estilo de DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+
+{% if request.user.is_staff %}
+{% if User %}
+<div class="container mt-5">
+    <!-- Tarjeta para envolver el contenido -->
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <!-- Título centrado con icono y color -->
+            <h2 class="text-center mb-4 text-info">
+                <!-- Icono a la izquierda del título -->
+                <i class="bi bi-people me-2"></i> Lista de Usuarios
+            </h2>
+
+            <!-- Tabla responsive -->
+            <div class="table-responsive">
+                <table id="user-table" class="table table-hover table-bordered align-middle table-striped">
+                    <thead class="table-info">
+                        <tr>
+                            <th class="col-1 text-center">ID Usuario</th>
+                            <th class="col-2 text-center">Nombre de Usuario</th>
+                            <th class="col-2 text-center">Rol</th>
+                            <th class="col-2 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in User %}
+                        <tr>
+                            <td class="text-center">{{ i.id }}</td>
+                            <td class="text-center">{{ i.username }}</td>
+                            </td>
+                            <td class="text-center">
+                                {% if i.groups.all %}
+                                    {% for group in i.groups.all %}
+                                        <span class="badge bg-info">{{ group.name }}</span>
+                                    {% endfor %}
+                                {% elif i.is_superuser %}
+                                    <span class="badge bg-success">Admin</span>
+                                {% else %}
+                                    <span class="text-muted">No asignado a ningún Rol</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <!-- Botones organizados con iconos -->
+                                <div class="d-flex justify-content-center gap-2">
+                                    <!-- Ver Detalles -->
+                                    <a href="{% url 'detalle_user' i.id %}" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <!-- Eliminar Usuario -->
+                                    <a href="{% url 'eliminar_user' i.id %}" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    <!-- Editar Usuario -->
+                                    <a href="{% url 'actualizar_user' i.id %}" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="container mt-5">
+    <!-- Mensaje de alerta cuando no hay usuarios -->
+    <div class="alert alert-warning text-center">
+        <h4>No hay usuarios registrados</h4>
+    </div>
+</div>
+{% endif %}
+{% else %}
+<div class="container mt-5">
+    <!-- Mensaje que aparecerá cuando un usuario no autorizado intente acceder a la vista a través de la url-->
+    <div class="alert alert-danger text-center">
+        <h4>Usted no está autorizado para acceder a este sitio</h4>
+    </div>
+<div>
+{% endif %}
+
+<!-- Scripts de DataTables y jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Activar DataTables para la tabla de usuarios
+        $("#user-table").DataTable();
+    });
+</script>
+
+{% endblock %}

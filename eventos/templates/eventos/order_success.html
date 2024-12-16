@@ -1,0 +1,20 @@
+{% extends 'eventos/base.html' %}
+{% block content %}
+<div class="container">
+        <h2>¡Compra realizada con éxito!</h2>
+        <p>Gracias por tu compra, {{ order.user.username }}.</p>
+        <p>Detalles de la orden:</p>
+        <ul>
+            <li>Número de orden: {{ order.id }}</li>
+            <li>Fecha: {{ order.created_at }}</li>
+            <li>Cantidad de entradas: {{orderItem.quantity}}</li>
+            <li>Total pagado: ${{ order.total_price }}</li>
+        </ul>
+        {% if not pdf %}
+        <form action="{% url 'order_success' order.id %}" method="get" target="_blank">
+            <button type="submit" name="pdf" class="btn btn-primary m-1" value="true">Descargar PDF</button>
+        </form>
+        <a href="{% url 'eventList' %}" class='btn btn-dark m-1'>Volver a la página principal</a>
+        {% endif %}
+</div>
+{% endblock %}

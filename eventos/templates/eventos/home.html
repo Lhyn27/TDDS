@@ -1,0 +1,45 @@
+{% extends "eventos/base.html" %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="header-section">
+    <h1>Descubre eventos increíbles</h1>
+    <p>Encuentra y compra entradas para los mejores conciertos, festivales y eventos culturales.</p>
+    <a href="{% url "eventList" %}" class="btn btn-light">Ver todos los eventos</a>
+</section>
+
+<!-- Featured Events Section -->
+<section class="featured-events">
+    <div class="container">
+        <h2 class="text-center">Eventos Destacados</h2>
+        {% if Highlights %}
+        <div class="row">
+            {% for event in Highlights|slice:":3" %}
+            <div class="col-md-4">
+                <div class="event-card">
+                    <h5>Nombre: {{ event.name }}</h5>
+                    {% if event.image %}
+                        <img src="{{ event.image.url }}" alt="{{ event.name }}" class="img-fluid mb-3">
+                    {% else %}
+                        <img src="https://via.placeholder.com/150" alt="Event Image" class="img-fluid mb-3">
+                    {% endif %}
+                    <p>Precio: ${{ event.price }}</p>
+                    <p>Fecha: {{ event.date|date:"d/m/Y" }}</p>
+                    <p>Hora: {{ event.time|time:"h:i A" }}</p>
+                    <p>Ubicacion: {{ event.address }}</p>
+                    {% if request.user.is_authenticated and event.available_tickets %}
+                    <a href="{% url 'buy_ticket' event.id %}" class="btn btn-primary">Comprar entrada</a>
+                    {% elif not event.available_tickets %}
+                    <button class="btn btn-secondary" disabled>Entradas Agotadas</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <h2 class='text-center'>No hay eventos disponibles actualmente</h2>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}
+
