@@ -1,67 +1,96 @@
 {% extends "eventos/base.html" %}
 
 {% block content %}
-<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css"> 
-<div class="container mt-4">
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5">
+                <i class="bi bi-calendar2-event me-2"></i>Eventos Disponibles
+            </h1>
+        </div>
+    </div>
+
     <div class="row">
-        <!-- Barra lateral de búsqueda -->
+        <!-- Barra lateral de filtros -->
         <div class="col-md-3">
-            <div class="card mb-4">
+            <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Filtrar Eventos</h5>
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-funnel me-2"></i>Filtrar Eventos
+                    </h5>
                 </div>
                 <div class="card-body">
                     <form method="GET" action="">
                         <div class="mb-3">
-                            <label for="search" class="form-label">Buscar por nombre:</label>
-                            <input type="text" name="search" id="search" class="form-control" placeholder="Buscar eventos...">
+                            <label for="search" class="form-label">
+                                <i class="bi bi-search me-2"></i>Buscar por nombre:
+                            </label>
+                            <input type="text" name="search" id="search" 
+                                   class="form-control" placeholder="Nombre del evento...">
                         </div>
-                        <button class="btn btn-primary w-100" type="submit">Buscar</button>
+                        <button class="btn btn-primary w-100" type="submit">
+                            <i class="bi bi-search me-2"></i>Buscar
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
 
         <!-- Lista de eventos -->
-         {% if Events %}
-         <div class="col-md-9" id='eventList'>
-            <div class="row">
+        {% if Events %}
+        <div class="col-md-9" id="eventList">
+            <div class="row g-4">
                 {% for event in Events %}
-                <div class="col-md-6 mb-4 event-card">
-                    <div class="card">
-                        {% if event.image %}
-                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.name }}">
-                        {% else %}
-                            <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Placeholder">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ event.name }}</h5>
-                            <p class="card-text">
-                                <strong>Precio:</strong> ${{ event.price }}<br>
-                                <strong>Fecha:</strong> {{ event.date }}<br>
-                                <strong>Hora:</strong> {{ event.time }}<br>
-                                <strong>Ubicacion:</strong> {{ event.address }}<br>
-                                <strong>Categorias:</strong>
-                                <ul class="list-inline">
-                                    {% for c in event.category.all %}
-                                        <li class="list-inline-item">{{ c.name }}</li>
-                                    {% endfor %}
-                                </ul>
-                                <strong>Entradas disponibles:</strong> {{ event.available_tickets }}
-                            </p>
-                            {% if event.available_tickets %}
-                            <a href="{% url 'buy_ticket' event.id %}" class="btn btn-primary">Comprar entrada</a>
+                <div class="col-md-6 event-card">
+                    <a href="{% url 'event_detail' event.id %}" class="text-decoration-none text-dark">
+                        <div class="card h-100 shadow-sm hover-shadow">
+                            {% if event.image %}
+                                <img src="{{ event.image.url }}" class="card-img-top object-fit-cover" 
+                                     style="height: 200px;" alt="{{ event.name }}">
                             {% else %}
-                            <button class="btn btn-secondary" disabled>Entradas Agotadas</button>
+                                <img src="https://via.placeholder.com/300x200" class="card-img-top" 
+                                     alt="Placeholder">
                             {% endif %}
-                            {% for group in request.user.groups.all %}
-                                {% if group.name == "Organizador de Eventos" %}
-                                    <a href="{% url 'updateEvent' event.id %}" class="btn btn-warning">Editar evento</a>
-                                    <a href="{% url 'deleteEvent' event.id %}" class="btn btn-danger">Eliminar evento</a>
-                                {% endif %}
-                            {% endfor %}
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3">{{ event.name }}</h5>
+                                <div class="mb-3">
+                                    <p class="card-text mb-2">
+                                        <i class="bi bi-calendar-event me-2"></i>
+                                        <strong>Fecha:</strong> {{ event.date|date:"d/m/Y" }}
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <i class="bi bi-clock me-2"></i>
+                                        <strong>Hora:</strong> {{ event.time|time:"h:i A" }}
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <i class="bi bi-geo-alt me-2"></i>
+                                        <strong>Ubicación:</strong> {{ event.address }}
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <i class="bi bi-tags me-2"></i>
+                                        <strong>Categorías:</strong>
+                                        {% for category in event.category.all %}
+                                            <span class="badge bg-info me-1">{{ category.name }}</span>
+                                        {% endfor %}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <small class="text-muted">Entradas disponibles:</small>
+                                            {% if event.available_tickets > 0 %}
+                                                <span class="badge bg-success ms-1">{{ event.available_tickets }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger ms-1">Agotadas</span>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">Precio:</small>
+                                            <span class="badge bg-primary ms-1">${{ event.price }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 {% empty %}
                 <div class="col-12 text-center">
@@ -87,4 +116,16 @@
         });
     });
 </script>
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    
+    .hover-primary:hover {
+        color: var(--bs-primary) !important;
+        transition: color 0.3s ease;
+    }
+</style>
 {% endblock content %}

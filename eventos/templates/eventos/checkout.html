@@ -1,35 +1,122 @@
 {% extends 'eventos/base.html' %}
+
 {% block content %}
-
-{% load custom_filters %}
-<div class="container mt-5">
-    <h2>Resumen de tu compra</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Evento</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in cart.items.all %}
-            <tr>
-                <td>{{ item.event.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>${{ item.event.price }}</td>
-                <td>${{ item.event.price|multiply:item.quantity }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h3>Total: ${{ total_price }}</h3>
-
-    <form method="POST">
+<div class="container py-5">
+    <h1 class="display-4 text-center mb-5">Checkout</h1>
+    
+    <form method="post" class="col-lg-8 mx-auto">
         {% csrf_token %}
-        <button type="submit" class='btn btn-success'>Confirmar Compra</button>
+        
+        <!-- Mostrar errores de validación -->
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Información del cliente -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h2 class="h5 mb-0">Información del cliente</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="first_name" class="form-label">Nombre</label>
+                        <input type="text" id="first_name" name="first_name" 
+                               value="{{ form_data.first_name }}" required class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="last_name" class="form-label">Apellido</label>
+                        <input type="text" id="last_name" name="last_name" 
+                               value="{{ form_data.last_name }}" required class="form-control">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" 
+                           value="{{ form_data.email }}" required class="form-control">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información de pago -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h2 class="h5 mb-0">Información de pago</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="card_number" class="form-label">Número de tarjeta</label>
+                    <input type="text" id="card_number" name="card_number" 
+                           value="{{ form_data.card_number }}" required class="form-control" 
+                           placeholder="0000 0000 0000 0000" maxlength="19">
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="expiry_month" class="form-label">Mes</label>
+                        <input type="text" id="expiry_month" name="expiry_month" 
+                               value="{{ form_data.expiry_month }}" required class="form-control" 
+                               placeholder="MM" maxlength="2">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="expiry_year" class="form-label">Año</label>
+                        <input type="text" id="expiry_year" name="expiry_year" 
+                               value="{{ form_data.expiry_year }}" required class="form-control" 
+                               placeholder="YY" maxlength="2">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="cvv" class="form-label">CVV</label>
+                        <input type="text" id="cvv" name="cvv" 
+                               value="{{ form_data.cvv }}" required class="form-control" 
+                               maxlength="4">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumen del pedido -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h2 class="h5 mb-0">Resumen del pedido</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Evento</th>
+                                <th scope="col" class="text-end">Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td>{{ item.event.name }}</td>
+                                <td class="text-end">${{ item.event.price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <td class="fw-bold">Total</td>
+                                <td class="text-end fw-bold">${{ total_price }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-grid">
+            <button type="submit" class="btn btn-success btn-lg">
+                Completar compra
+            </button>
+        </div>
     </form>
 </div>
 {% endblock %}

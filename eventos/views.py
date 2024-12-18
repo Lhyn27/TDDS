@@ -22,12 +22,21 @@ class EventListView(ListView):
     template_name = 'eventos/event_list.html'
     context_object_name = 'Events'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_organizer'] = self.request.user.groups.filter(name='Organizador de Eventos').exists()
+        return context
+
 @method_decorator(login_required, name='dispatch')
 class EventCreateView(CreateView):
     model = Event
     form_class = EventForm
     template_name = 'eventos/event_form.html'
     success_url = reverse_lazy('eventList')
+
+    def form_valid(self, form):
+        form.instance.organizer = self.request.user
+        return super().form_valid(form)
 
 @method_decorator(login_required, name='dispatch')
 class EventUpdateView(UpdateView):
@@ -54,13 +63,6 @@ class CategoryCreateView(CreateView):
     form_class = CategoryForm
     template_name = 'eventos/create_category.html'
     success_url = reverse_lazy('eventList')
-
-def contacto(request):
-    context = {
-        'mensaje': 'Correo electrónico : eventos@todoarica.cl' ,
-        'mensaje2': 'Número: +56 9 8765 4321'
-    }
-    return render(request, 'eventos/contacto.html', context)
 
 @method_decorator(login_required, name='dispatch')
 class Anadir_Entradas_Carrito(CreateView):
@@ -122,6 +124,41 @@ class Listar_Carrito(ListView):
         context['cart_items'] = cart_items
         context['total_price'] = total_price
         return context
+    
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+
+        if action:
+            item_id = action.split('_')[1]
+            cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
+
+            if 'increase' in action:
+                cart_item.quantity += 1
+            elif 'decrease' in action and cart_item.quantity > 1:
+                cart_item.quantity -= 1
+            elif 'delete' in action:
+                cart_item.delete()
+                return redirect('cart_view')
+            
+            cart_item.save()
+        
+        return redirect('cart_view')
+
+def luhn_algorithm(card_number):
+    card_number = card_number.replace(" ", "")
+    if not card_number.isdigit():
+        return False
+    
+    total = 0
+    reverse_digits = card_number[::-1]
+    for i, digit in enumerate(reverse_digits):
+        n = int(digit)
+        if i % 2 == 1:
+            n *= 2
+            if n > 9:
+                n -= 9
+        total += n
+    return total % 10 == 0
 
 @method_decorator(login_required, name='dispatch')
 class CheckoutView(View):
@@ -132,43 +169,74 @@ class CheckoutView(View):
         if not cart or not cart.items.exists():
             messages.error(request, "Tu carrito está vacío")
             return redirect('cart_view')
+        
         cart_items = cart.items.all()
         total_price = sum([item.event.price * item.quantity for item in cart_items])
         
-        return render(request, "eventos/checkout.html", {'cart': cart, 'total_price': total_price})
+        # Prellenar con datos del usuario
+        initial_data = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+        }
+        
+        return render(request, self.template_name, {
+            'cart': cart, 
+            'cart_items': cart_items,
+            'total_price': total_price,
+            'form_data': initial_data
+        })
     
     def post(self, request):
-        cart = Cart.objects.filter(user=request.user).first()
-        if not cart or not cart.items.exists():
-            messages.error(request, "Tu carrito está vacío")
-            return redirect('cart_view')
-        
-        with transaction.atomic():
-            order = Order.objects.create(
-                user=request.user,
-                total_price=sum(item.event.price * item.quantity for item in cart.items.all()),
-                is_completed=True 
-            )
-
-            for cart_item in cart.items.all():
-                if cart_item.quantity > cart_item.event.available_tickets:
-                    messages.error(request, f"No hay suficientes entradas disponibles para {cart_item.event.name}")
+        try:
+            with transaction.atomic():
+                # Verificar que hay items antes de crear la orden
+                cart = Cart.objects.filter(user=request.user).first()
+                if not cart or not cart.items.exists():
+                    messages.error(request, "Tu carrito está vacío")
                     return redirect('cart_view')
+
+                # Calcular el total antes de crear la orden
+                total_price = sum(item.event.price * item.quantity for item in cart.items.all())
                 
-                OrderItem.objects.create(
-                    order=order,
-                    event=cart_item.event,
-                    quantity=cart_item.quantity,
-                    price=cart_item.event.price
-                )
+                # Solo crear la orden si hay un total válido
+                if total_price > 0:
+                    order = Order.objects.create(
+                        user=request.user,
+                        total_price=total_price,
+                        is_completed=True 
+                    )
 
-                cart_item.event.available_tickets -= cart_item.quantity
-                cart_item.event.save()
-            
-            cart.items.all().delete()
+                    # Crear los items de la orden
+                    for cart_item in cart.items.all():
+                        if cart_item.quantity > cart_item.event.available_tickets:
+                            raise ValueError(f"No hay suficientes entradas disponibles para {cart_item.event.name}")
+                        
+                        OrderItem.objects.create(
+                            order=order,
+                            event=cart_item.event,
+                            quantity=cart_item.quantity,
+                            price=int(cart_item.event.price)
+                        )
 
-        messages.success(request, "Compra realizada con éxito.")
-        return redirect('order_success', order_id=order.id)
+                        cart_item.event.available_tickets -= cart_item.quantity
+                        cart_item.event.save()
+                    
+                    # Limpiar el carrito solo si todo fue exitoso
+                    cart.items.all().delete()
+                    
+                    messages.success(request, "Compra realizada con éxito.")
+                    return redirect('order_success', order_id=order.id)
+                else:
+                    messages.error(request, "El total de la orden debe ser mayor a 0")
+                    return redirect('cart_view')
+                    
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect('cart_view')
+        except Exception as e:
+            messages.error(request, "Error al procesar la compra. Por favor, intente nuevamente.")
+            return redirect('checkout')
 
 @method_decorator(login_required, name='dispatch')
 class OrderSuccessView(View):
@@ -177,18 +245,35 @@ class OrderSuccessView(View):
         if 'pdf' in request.GET:
             return self.generar_pdf(order_id)
         
-        order = Order.objects.get(id=order_id, user=request.user)
-        orderItem = OrderItem.objects.get(id=order_id)
+        # Obtener la orden
+        order = get_object_or_404(Order, id=order_id)
         
-        return render(request, 'eventos/order_success.html', {'order': order, 'orderItem': orderItem})
+        # Verificar permisos
+        if not (request.user.is_staff or 
+                request.user == order.user or 
+                (request.user.groups.filter(name='Organizador de Eventos').exists() and 
+                 order.orderitem_set.filter(event__organizer=request.user).exists())):
+            messages.error(request, "No tienes permiso para ver esta orden")
+            return redirect('eventHome')
+        
+        order_items = OrderItem.objects.filter(order=order)
+        total_tickets = sum(item.quantity for item in order_items)
+        
+        return render(request, 'eventos/order_success.html', {
+            'order': order,
+            'order_items': order_items,
+            'total_tickets': total_tickets
+        })
 
     def generar_pdf(self, order_id):
         # Obtener los datos del modelo
         order = get_object_or_404(Order, id=order_id)
-        order_item = get_object_or_404(OrderItem, order=order)
+        order_items = OrderItem.objects.filter(order=order)
+        total_tickets = sum(item.quantity for item in order_items)
         context = {
             'order': order,
-            'orderItem': order_item,
+            'order_item': order_items,
+            'total_tickets': total_tickets,
             'pdf': True,  # Indicamos que estamos generando un PDF
         }
 
@@ -219,6 +304,18 @@ class Listar_Usuario(ListView):
     template_name = "eventos/listar_usuario.html"
     context_object_name= 'User'
 
+    def get_queryset(self):
+        return User.objects.filter(groups__name='Usuario')
+
+@method_decorator(login_required, name='dispatch')
+class Listar_Trabajadores(ListView):
+    model = User
+    template_name = "eventos/listar_trabajadores.html"
+    context_object_name = "Worker"
+    
+    def get_queryset(self):
+        return User.objects.exclude(groups__name='Usuario')
+
 @method_decorator(login_required, name='dispatch')
 class Detalle_Usuario(DetailView):
     model = User
@@ -237,3 +334,51 @@ class Actualizar_Usuario(UpdateView):
     template_name = "eventos/actualizar_usuario.html"
     form_class = UpdateUserForm
     success_url = reverse_lazy('list_user')
+
+@method_decorator(login_required, name='dispatch')
+class AdminPurchaseHistoryView(View):
+    template_name = 'eventos/admin_purchase_history.html'
+
+    def get(self, request):
+        if request.user.is_staff:
+            # Admin ve todas las compras
+            orders = Order.objects.all().prefetch_related(
+                'items', 
+                'items__event'
+            ).order_by('-created_at')
+        elif request.user.groups.filter(name='Organizador de Eventos').exists():
+            # Organizador ve solo las compras de sus eventos
+            orders = Order.objects.filter(
+                items__event__organizer=request.user
+            ).prefetch_related(
+                'items', 
+                'items__event'
+            ).distinct().order_by('-created_at')
+        else:
+            messages.error(request, "No tienes permiso para ver esta página")
+            return redirect('eventHome')
+
+        # Debug: Imprimir información sobre las órdenes
+        print(f"Número de órdenes: {orders.count()}")
+        for order in orders:
+            print(f"Orden {order.id}: {order.items.count()} items")
+
+        return render(request, self.template_name, {
+            'orders': orders,
+            'is_admin': request.user.is_staff
+        })
+
+@method_decorator(login_required, name='dispatch')
+class EventDetailView(DetailView):
+    model = Event
+    template_name = 'eventos/event_detail.html'
+    context_object_name = 'event'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Verificar si el usuario es organizador o admin
+        context['can_edit'] = (
+            self.request.user.is_staff or 
+            self.request.user.groups.filter(name='Organizador de Eventos').exists()
+        )
+        return context

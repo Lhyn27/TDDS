@@ -1,30 +1,74 @@
 {% extends 'eventos/base.html' %}
 
 {% block content %}
-<h2>Historial de Compras</h2>
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5">
+                <i class="bi bi-receipt me-2"></i>Mi Historial de Compras
+            </h1>
+        </div>
+    </div>
 
-{% if orders %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Número de Orden</th>
-                <th>Fecha de Compra</th>
-                <th>Total</th>
-                <th>Detalles</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>{{ order.created_at }}</td>
-                <td>${{ order.total_price }}</td>
-                <td><a href="{% url 'order_success' order.id %}" class="btn btn-primary">Ver detalles</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No has realizado ninguna compra todavía.</p>
-{% endif %}
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th><i class="bi bi-hash me-2"></i>Orden</th>
+                    <th><i class="bi bi-calendar me-2"></i>Fecha</th>
+                    <th><i class="bi bi-ticket-detailed me-2"></i>Eventos</th>
+                    <th><i class="bi bi-currency-dollar me-2"></i>Total</th>
+                    <th><i class="bi bi-check-circle me-2"></i>Estado</th>
+                    <th class="text-center"><i class="bi bi-gear me-2"></i>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if order.items.exists %}
+                            {% for item in order.items.all %}
+                                <div class="mb-1">
+                                    <span class="badge bg-info">{{ item.quantity }}x</span>
+                                    {{ item.event.name }}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">Sin items</span>
+                        {% endif %}
+                    </td>
+                    <td>${{ order.total_price }}</td>
+                    <td>
+                        {% if order.is_completed %}
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Completada
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning">
+                                <i class="bi bi-clock me-1"></i>Pendiente
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'order_success' order.id %}" 
+                           class="btn btn-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i>Ver Detalles
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        No has realizado ninguna compra todavía.
+        <a href="{% url 'eventList' %}" class="alert-link ms-2">Ver eventos disponibles</a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

@@ -1,15 +1,178 @@
 {% extends 'eventos/base.html' %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
-    <div class="card p-4 shadow-lg" style="width: 100%; max-width: 400px;">
-        <h1 class="text-center">Añadir al Carrito</h1>
-        <h3 class="text-center">{{ event.name }}</h3>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary btn-block mt-3 w-100">Añadir</button>
-        </form>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-3">
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.name }}"
+                         style="height: 250px; object-fit: cover;">
+                {% endif %}
+                
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="bi bi-ticket-perforated me-2"></i>Comprar Entradas
+                    </h2>
+
+                    <div class="event-info mb-4">
+                        <h3 class="h4 mb-3">{{ event.name }}</h3>
+                        
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="info-item">
+                                    <i class="bi bi-calendar-event fs-5 text-primary"></i>
+                                    <div>
+                                        <small class="text-muted">Fecha</small>
+                                        <strong class="d-block">{{ event.date|date:"d/m/Y" }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-6">
+                                <div class="info-item">
+                                    <i class="bi bi-clock fs-5 text-primary"></i>
+                                    <div>
+                                        <small class="text-muted">Hora</small>
+                                        <strong class="d-block">{{ event.time|time:"h:i A" }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-6">
+                                <div class="info-item">
+                                    <i class="bi bi-geo-alt fs-5 text-primary"></i>
+                                    <div>
+                                        <small class="text-muted">Ubicación</small>
+                                        <strong class="d-block">{{ event.address }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-6">
+                                <div class="info-item">
+                                    <i class="bi bi-currency-dollar fs-5 text-primary"></i>
+                                    <div>
+                                        <small class="text-muted">Precio por entrada</small>
+                                        <strong class="d-block">${{ event.price }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="info-item">
+                                    <i class="bi bi-ticket-detailed fs-5 text-primary"></i>
+                                    <div>
+                                        <small class="text-muted">Entradas disponibles</small>
+                                        <strong class="d-block">{{ event.available_tickets }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                                <i class="bi bi-123 me-2"></i>Cantidad de entradas
+                            </label>
+                            <div class="quantity-input">
+                                <input type="number" 
+                                       name="{{ form.quantity.name }}"
+                                       id="{{ form.quantity.id_for_label }}"
+                                       value="1"
+                                       min="1"
+                                       max="{{ event.available_tickets }}"
+                                       required
+                                       class="form-control text-center"
+                                       oninvalid="this.setCustomValidity('Por favor ingresa una cantidad válida')"
+                                       oninput="this.setCustomValidity('')">
+                                {% if form.quantity.errors %}
+                                    <div class="invalid-feedback d-block mt-2">
+                                        {{ form.quantity.errors|join:", " }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-cart-plus me-2"></i>Añadir al carrito
+                            </button>
+                            <a href="{% url 'eventList' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Volver
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+    overflow: hidden;
+}
+
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.info-item i {
+    font-size: 1.5rem;
+    width: 2rem;
+    text-align: center;
+}
+
+.quantity-input {
+    max-width: 200px;
+    margin: 0 auto;
+}
+
+.quantity-input input {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    height: 2em;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]:invalid {
+    border-color: #dc3545;
+}
+
+@media (max-width: 576px) {
+    .info-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+}
+</style>
 {% endblock %}

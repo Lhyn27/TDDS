@@ -7,7 +7,7 @@
         <ul>
             <li>Número de orden: {{ order.id }}</li>
             <li>Fecha: {{ order.created_at }}</li>
-            <li>Cantidad de entradas: {{orderItem.quantity}}</li>
+            <li>Cantidad de entradas: {{ total_tickets }}</li>
             <li>Total pagado: ${{ order.total_price }}</li>
         </ul>
         {% if not pdf %}

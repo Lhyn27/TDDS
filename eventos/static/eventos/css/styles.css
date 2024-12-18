@@ -51,25 +51,35 @@ header {
 
 
 .header-section {
-    background-color: #1c1c1c;
-    color: #ffffff;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/static/eventos/images/header-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
     text-align: center;
-    padding: 50px 0;
+    padding: 5rem 1rem;
+    margin-bottom: 3rem;
 }
 
 .featured-events {
-    background-color: #f2f2f2;
-    padding: 40px 0;
+    padding-bottom: 3rem;
 }
 
 .event-card {
-    border-radius: 8px;
-    background-color: #ffffff;
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 20px;
+    background: white;
+    transition: transform 0.3s ease;
 }
 
+.event-card:hover {
+    transform: translateY(-5px);
+}
+
+.event-details {
+    color: #666;
+}
+
+.event-details i {
+    color: #0d6efd;
+}
 
 .btn-primary {
     background-color: #000000;
@@ -91,7 +101,77 @@ footer {
     padding: 20px;
 }
 
+/* Footer Styles */
+.footer {
+    margin-top: auto;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.footer a:hover {
+    opacity: 0.8;
+}
+
+.footer .social-links a {
+    transition: transform 0.3s ease;
+}
+
+.footer .social-links a:hover {
+    transform: translateY(-3px);
+}
+
 
 .content {
     padding: 20px;
+}
+
+/* Estilos para el footer sticky */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+.footer {
+    flex-shrink: 0;
+}
+
+/* Estilos para las redes sociales en el footer */
+.social-links a {
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.social-links a:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff !important;
+    text-decoration: none;
+}
+
+.social-links i {
+    font-size: 1.25rem;
 }

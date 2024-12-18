@@ -10,9 +10,10 @@ class Category(models.Model):
         return self.name
 
 class Event(models.Model):
+    organizer = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='events')
     name = models.CharField(max_length=100, verbose_name="Nombre")
     image = models.ImageField(upload_to="events/images/", null=True, blank=True, verbose_name="Imagen")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio")
+    price = models.IntegerField(verbose_name='Precio')
     date = models.DateField(verbose_name="Fecha")
     time = models.TimeField(verbose_name="Hora")
     address = models.CharField(max_length=200, verbose_name="Ubicación")
@@ -40,7 +41,7 @@ class CartItem(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.IntegerField()
     is_completed = models.BooleanField(default=False)
 
     def __str__(self) -> str:
@@ -50,7 +51,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    price =  models.DecimalField(max_digits=10, decimal_places=2)
+    price =  models.IntegerField()
 
     def get_subtotal(self):
         return self.quantity * self.price

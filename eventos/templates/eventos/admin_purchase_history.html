@@ -1,0 +1,60 @@
+{% extends 'eventos/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">{% if is_admin %}Todas las Compras{% else %}Compras de Mis Eventos{% endif %}</h1>
+
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Orden #</th>
+                    <th>Usuario</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Eventos</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>${{ order.total_price }}</td>
+                    <td>
+                        {% if order.items.exists %}
+                            {% for item in order.items.all %}
+                                <div>{{ item.event.name }} (x{{ item.quantity }})</div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-muted">Sin items</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if order.is_completed %}
+                            <span class="badge bg-success">Completada</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pendiente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'order_success' order.id %}" class="btn btn-sm btn-primary">
+                            Ver Detalles
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        No hay compras registradas.
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

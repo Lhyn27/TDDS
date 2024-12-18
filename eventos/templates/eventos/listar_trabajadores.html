@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
 
 {% if request.user.is_staff %}
-{% if User %}
+{% if Worker %}
 <div class="container mt-5">
     <!-- Tarjeta para envolver el contenido -->
     <div class="card shadow-lg border-0">
@@ -14,7 +14,7 @@
             <!-- Título centrado con icono y color -->
             <h2 class="text-center mb-4 text-info">
                 <!-- Icono a la izquierda del título -->
-                <i class="bi bi-people me-2"></i> Lista de Usuarios
+                <i class="bi bi-people me-2"></i> Lista de Trabajadores
             </h2>
 
             <!-- Tabla responsive -->
@@ -29,7 +29,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in User %}
+                        {% for i in Worker %}
                         <tr>
                             <td class="text-center">{{ i.id }}</td>
                             <td class="text-center">{{ i.username }}</td>

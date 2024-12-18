@@ -19,7 +19,6 @@ from django.urls import path, include
 from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', include('eventos.urls')),
     path('accounts/', include('registration.urls')),
     path('accounts/', include('django.contrib.auth.urls'))

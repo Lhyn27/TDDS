@@ -34,6 +34,11 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuDropdown">
                             {% if request.user.is_staff %}
                                 <li><a class="dropdown-item" href="{% url 'list_user' %}"><i class="bi bi-people me-1"></i>Listar Usuarios</a></li>
+                                <li><a class="dropdown-item" href="{% url 'list_worker' %}"><i class="bi bi-people me-1"></i>Listar Trabajadores</a></li>
+                                <li><a class="dropdown-item" href="{% url 'eventList' %}"><i class="bi bi-calendar2-week me-1"></i>Eventos</a></li>
+                                <li><a class="dropdown-item" href="{% url 'createEvent' %}"><i class="bi bi-calendar-plus me-1"></i>Crear Evento</a></li>
+                                <li><a class="dropdown-item" href="{% url 'createCategory' %}"><i class="bi bi-tags me-1"></i>Crear Categoría</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_purchase_history' %}"><i class="bi bi-cart-check me-1"></i>Ver Todas las Compras</a></li>
                             {% endif %}
                             
                             {% for group in request.user.groups.all %}
@@ -41,15 +46,13 @@
                                     <li><a class="dropdown-item" href="{% url 'eventList' %}"><i class="bi bi-calendar2-week me-1"></i>Eventos</a></li>
                                     <li><a class="dropdown-item" href="{% url 'createEvent' %}"><i class="bi bi-calendar-plus me-1"></i>Crear Evento</a></li>
                                     <li><a class="dropdown-item" href="{% url 'createCategory' %}"><i class="bi bi-tags me-1"></i>Crear Categoría</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'admin_purchase_history' %}"><i class="bi bi-cart-check me-1"></i>Ver Compras de Mis Eventos</a></li>
                                 {% endif %}
                                 {% if group.name == "Usuario" %}
                                     <li><a class="dropdown-item" href="{% url 'eventList' %}"><i class="bi bi-calendar2-week me-1"></i>Eventos</a></li>
                                 {% endif %}
                             {% endfor %}
                         </ul>                        
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'contacto' %}"><i class="bi bi-envelope me-1"></i>Contáctanos</a>
                     </li>
                     {% if request.user.is_authenticated %}
                     <li class="nav-item dropdown">
@@ -83,11 +86,73 @@
         </div>
     </nav>
     {% endif %}
-    <main>
+    <main class="flex-grow-1">
         {% block content %}
         {% endblock content %}
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% if not pdf %}
+    <footer class="footer bg-dark text-light py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Columna de información de la empresa -->
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">TodoAricaEventos</h5>
+                    <p class="mb-2">Tu portal de eventos en Arica</p>
+                    <p class="mb-0"><i class="bi bi-geo-alt me-2"></i>Arica, Chile</p>
+                    <p class="mb-0"><i class="bi bi-envelope me-2"></i>eventos@todoarica.cl</p>
+                    <p class="mb-0"><i class="bi bi-telephone me-2"></i>+56 9 8765 4321</p>
+                </div>
+
+                <!-- Columna de enlaces rápidos -->
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'eventHome' %}" class="text-light text-decoration-none">Inicio</a></li>
+                        <li class="mb-2"><a href="{% url 'eventList' %}" class="text-light text-decoration-none">Eventos</a></li>
+                        {% if request.user.is_authenticated %}
+                        <li class="mb-2"><a href="{% url 'cart_view' %}" class="text-light text-decoration-none">Mi Carrito</a></li>
+                        <li class="mb-2"><a href="{% url 'historial_compras' %}" class="text-light text-decoration-none">Mis Compras</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Columna de redes sociales -->
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3 text-center">Síguenos</h5>
+                    <div class="social-links d-flex gap-4 mb-4 justify-content-center">
+                        <a href="#" class="text-light text-decoration-none">
+                            <i class="bi bi-facebook fs-4"></i>
+                        </a>
+                        <a href="#" class="text-light text-decoration-none">
+                            <i class="bi bi-instagram fs-4"></i>
+                        </a>
+                        <a href="#" class="text-light text-decoration-none">
+                            <i class="bi bi-twitter-x fs-4"></i>
+                        </a>
+                        <a href="#" class="text-light text-decoration-none">
+                            <i class="bi bi-youtube fs-4"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Línea divisoria -->
+            <hr class="my-4">
+
+            <!-- Copyright -->
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; {% now "Y" %} TodoAricaEventos. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-light text-decoration-none me-3">Términos y Condiciones</a>
+                    <a href="#" class="text-light text-decoration-none">Política de Privacidad</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endif %}
 </body>
 </html>
