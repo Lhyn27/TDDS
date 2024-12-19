@@ -1,0 +1,28 @@
+{% extends 'eventos/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5">
+                <i class="bi bi-graph-up me-2"></i>Análisis de Eventos
+            </h1>
+        </div>
+    </div>
+
+    <div class="card shadow-lg mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-4">Análisis de Ventas</h5>
+            {% if graph %}
+                <img src="data:image/png;base64,{{ graph }}" class="img-fluid" alt="Gráficos de análisis">
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="?download=1" class="btn btn-success btn-lg">
+            <i class="bi bi-file-earmark-excel me-2"></i>Descargar Reporte Excel
+        </a>
+    </div>
+</div>
+{% endblock %} 

@@ -1,31 +1,42 @@
 {% extends "eventos/base.html" %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center align-items-center">
-    <div class="card text-center bg-dark border-light shadow-lg">
-        <div class="card-body text-light">
-            <!-- Título con icono -->
-            <h2 class="card-title">
-                <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i> 
-                Confirmar Eliminación
-            </h2>
-            <hr class="border-light">
-            <!-- Mensaje de confirmación -->
-            <p class="card-text fs-5">¿Estás seguro de que quieres eliminar el usuario <strong>"{{ object.username }}"</strong>?</p>
-            <form method="post" id="eliminar_usuario">
-                {% csrf_token %}
-                <!-- Botones estilizados -->
-                <div class="d-flex justify-content-center">
-                    <button type="submit" class="btn btn-danger btn-lg me-3">
-                        <i class="bi bi-check-circle me-1"></i> Confirmar
-                    </button>
-                    <a href="{% url "list_user" %}" class="btn btn-secondary btn-lg">
-                        <i class="bi bi-x-circle me-1"></i> Cancelar
-                    </a>
-                </div>
-            </form>
+<div class="container mt-5">
+    {% if request.user.is_staff %}
+        <div class="card text-center bg-dark border-light shadow-lg">
+            <div class="card-body text-light">
+                <!-- Título con icono -->
+                <h2 class="card-title">
+                    <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i> 
+                    Confirmar Eliminación
+                </h2>
+                <hr class="border-light">
+                <!-- Mensaje de confirmación -->
+                <p class="card-text fs-5">¿Estás seguro de que quieres eliminar el usuario <strong>"{{ object.username }}"</strong>?</p>
+                <form method="post" id="eliminar_usuario">
+                    {% csrf_token %}
+                    <!-- Botones estilizados -->
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-danger btn-lg me-3">
+                            <i class="bi bi-check-circle me-1"></i> Confirmar
+                        </button>
+                        <a href="{% url "list_user" %}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    {% else %}
+        <div class="alert alert-danger text-center">
+            <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Acceso Denegado</h4>
+            <p>No tienes permisos para eliminar usuarios.</p>
+            <hr>
+            <a href="{% url 'eventHome' %}" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-2"></i>Volver al inicio
+            </a>
+        </div>
+    {% endif %}
 </div>
 
 <!-- Scripts -->

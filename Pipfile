@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 django = "*"
 weasyprint = "*"
+pandas = "*"
+seaborn = "*"
+openpyxl = "*"
+matplotlib = "*"
 
 [dev-packages]
 

@@ -1,6 +1,7 @@
 {% extends "eventos/base.html" %}
 {% block content %}
 <div class="container mt-5 d-flex justify-content-center align-items-center">
+    {% if request.user.is_staff %}
     <div class="card text-center bg-dark border-light shadow-lg" style="max-width: 500px;">
         <div class="card-body">
             <h2 class="card-title text-warning mb-4">
@@ -22,5 +23,15 @@
             </form>
         </div>
     </div>
+    {% else %}
+    <div class="alert alert-danger text-center">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Acceso Denegado</h4>
+        <p>No tienes permisos para eliminar eventos.</p>
+        <hr>
+        <a href="{% url 'eventList' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-2"></i>Volver a la lista de eventos
+        </a>
+    </div>
+    {% endif %}
 </div>
 {% endblock content %}

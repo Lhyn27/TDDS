@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="container mt-5">
+    {% if request.user.is_staff %}
     <div class="row">
         <div class="col-md-8 offset-md-2">
             <h2 class="mb-4">{% if object %}Editar{% else %}Crear{% endif %} Categoria</h2>
@@ -16,6 +17,16 @@
             </form>
         </div>
     </div>
+    {% else %}
+    <div class="alert alert-danger text-center">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Acceso Denegado</h4>
+        <p>No tienes permisos para crear categorías.</p>
+        <hr>
+        <a href="{% url 'eventList' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-2"></i>Volver a la lista de eventos
+        </a>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Scripts -->

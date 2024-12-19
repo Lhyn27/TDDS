@@ -2,26 +2,37 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="bg-light p-5 rounded shadow">
-        <h2 class="mb-4 text-center">
-            <i class="bi bi-pencil-square text-warning me-2"></i> 
-            Actualizar Usuario
-        </h2>
+    {% if request.user.is_staff %}
+        <div class="bg-light p-5 rounded shadow">
+            <h2 class="mb-4 text-center">
+                <i class="bi bi-pencil-square text-warning me-2"></i> 
+                Actualizar Usuario
+            </h2>
 
-        <form id="editar_usuario" method="post" class="needs-validation">
-            {% csrf_token %}
-            {{ form.as_p }}
+            <form id="editar_usuario" method="post" class="needs-validation">
+                {% csrf_token %}
+                {{ form.as_p }}
 
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-warning btn-lg">
-                    <i class="bi bi-pencil-square me-1"></i> Actualizar
-                </button>
-                <a href="{% url 'list_user' %}" class="btn btn-dark btn-lg ms-2">
-                    <i class="bi bi-arrow-left-circle me-2"></i> Volver
-                </a>
-            </div>
-        </form>
-    </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-warning btn-lg">
+                        <i class="bi bi-pencil-square me-1"></i> Actualizar
+                    </button>
+                    <a href="{% url 'list_user' %}" class="btn btn-dark btn-lg ms-2">
+                        <i class="bi bi-arrow-left-circle me-2"></i> Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <div class="alert alert-danger text-center">
+            <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Acceso Denegado</h4>
+            <p>No tienes permisos para actualizar usuarios.</p>
+            <hr>
+            <a href="{% url 'eventHome' %}" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-2"></i>Volver al inicio
+            </a>
+        </div>
+    {% endif %}
 </div>
 
 <!-- Scripts -->

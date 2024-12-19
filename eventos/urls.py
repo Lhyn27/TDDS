@@ -23,4 +23,5 @@ urlpatterns = [
     path('actualizar_usuario/<int:pk>/', views.Actualizar_Usuario.as_view(), name='actualizar_user'),
     path('eliminar_usuario/<int:pk>/', views.Eliminar_Usuario.as_view(), name='eliminar_user'),
     path('admin_purchase_history/', views.AdminPurchaseHistoryView.as_view(), name='admin_purchase_history'),
+    path('analytics/', views.AnalyticsView.as_view(), name='analytics'),
 ]

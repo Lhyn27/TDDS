@@ -82,9 +82,14 @@
 <div class="container mt-5">
     <!-- Mensaje que aparecerá cuando un usuario no autorizado intente acceder a la vista a través de la url-->
     <div class="alert alert-danger text-center">
-        <h4>Usted no está autorizado para acceder a este sitio</h4>
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Acceso Denegado</h4>
+        <p>No tienes permisos para ver esta página.</p>
+        <hr>
+        <a href="{% url 'eventHome' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-2"></i>Volver al inicio
+        </a>
     </div>
-<div>
+</div>
 {% endif %}
 
 <!-- Scripts de DataTables y jQuery -->

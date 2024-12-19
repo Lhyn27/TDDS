@@ -39,6 +39,7 @@
                                 <li><a class="dropdown-item" href="{% url 'createEvent' %}"><i class="bi bi-calendar-plus me-1"></i>Crear Evento</a></li>
                                 <li><a class="dropdown-item" href="{% url 'createCategory' %}"><i class="bi bi-tags me-1"></i>Crear Categoría</a></li>
                                 <li><a class="dropdown-item" href="{% url 'admin_purchase_history' %}"><i class="bi bi-cart-check me-1"></i>Ver Todas las Compras</a></li>
+                                <li><a class="dropdown-item" href="{% url 'analytics' %}"><i class="bi bi-graph-up me-1"></i>Análisis de Eventos</a></li>
                             {% endif %}
                             
                             {% for group in request.user.groups.all %}

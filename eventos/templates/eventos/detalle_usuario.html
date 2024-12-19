@@ -2,59 +2,70 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-body">
-            <h2 class="text-center mb-4">Detalles de Usuario</h2>
+    {% if request.user.is_staff %}
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Detalles de Usuario</h2>
 
-            {% if User %}
-            <!-- Detalle de los usuarios en tabla -->
-            <table class="table table-bordered table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th class="text-center">Detalles</th>
-                        <th class="text-center">Información</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="text-center">
-                            <strong><i class="bi bi-person-circle text-info"></i> ID:</strong>
-                        </td>
-                        <td class="text-center">{{ User.id }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">
-                            <strong><i class="bi bi-person-fill text-primary"></i> Nombre de Usuario:</strong>
-                        </td>
-                        <td class="text-center">{{ User.username }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">
-                            <strong><i class="bi bi-key-fill text-danger"></i> Rol:</strong>
-                        </td>
-                        <td class="text-center">
-                            {% if User.groups.all %}
-                                {% for group in User.groups.all %}
-                                    <span class="badge bg-info">{{ group.name }}</span>
-                                {% endfor %}
-                            {% elif User.is_superuser %}
-                                <span class="badge bg-success">Admin</span>
-                            {% else %}
-                                <span class="text-muted">No asignado a ningún Rol</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            {% endif %}
+                {% if User %}
+                <!-- Detalle de los usuarios en tabla -->
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center">Detalles</th>
+                            <th class="text-center">Información</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">
+                                <strong><i class="bi bi-person-circle text-info"></i> ID:</strong>
+                            </td>
+                            <td class="text-center">{{ User.id }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <strong><i class="bi bi-person-fill text-primary"></i> Nombre de Usuario:</strong>
+                            </td>
+                            <td class="text-center">{{ User.username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <strong><i class="bi bi-key-fill text-danger"></i> Rol:</strong>
+                            </td>
+                            <td class="text-center">
+                                {% if User.groups.all %}
+                                    {% for group in User.groups.all %}
+                                        <span class="badge bg-info">{{ group.name }}</span>
+                                    {% endfor %}
+                                {% elif User.is_superuser %}
+                                    <span class="badge bg-success">Admin</span>
+                                {% else %}
+                                    <span class="text-muted">No asignado a ningún Rol</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% endif %}
 
-            <!-- Botón para volver a la lista de reservas -->
-            <div class="text-center mt-3">
-                <a href="{% url 'list_user' %}" class="btn btn-primary btn-lg">
-                    <i class="bi bi-arrow-left-circle"></i> Volver a la Lista de Usuarios
-                </a>
+                <!-- Botón para volver a la lista de reservas -->
+                <div class="text-center mt-3">
+                    <a href="{% url 'list_user' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-left-circle"></i> Volver a la Lista de Usuarios
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    {% else %}
+        <div class="alert alert-danger text-center">
+            <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Acceso Denegado</h4>
+            <p>No tienes permisos para ver los detalles de usuarios.</p>
+            <hr>
+            <a href="{% url 'eventHome' %}" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-2"></i>Volver al inicio
+            </a>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

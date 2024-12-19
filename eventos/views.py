@@ -15,6 +15,8 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
+from .analytics import EventAnalytics
+from datetime import datetime
 
 # Create your views here.
 class EventListView(ListView):
@@ -382,3 +384,27 @@ class EventDetailView(DetailView):
             self.request.user.groups.filter(name='Organizador de Eventos').exists()
         )
         return context
+
+@method_decorator(login_required, name='dispatch')
+class AnalyticsView(View):
+    template_name = 'eventos/analytics.html'
+
+    def get(self, request):
+        if not request.user.is_staff:
+            messages.error(request, "No tienes permiso para ver esta página")
+            return redirect('eventHome')
+
+        excel_file, graph = EventAnalytics.generate_event_analysis()
+
+        if 'download' in request.GET:
+            # Descargar Excel
+            response = HttpResponse(
+                excel_file,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = f'attachment; filename=eventos_analysis_{datetime.now().strftime("%Y%m%d")}.xlsx'
+            return response
+
+        return render(request, self.template_name, {
+            'graph': graph
+        })
